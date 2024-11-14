@@ -25,7 +25,7 @@ def call(Map pipelineParams) {
                     echo "Building the project"
                     echo "************ In Build Stage for ${env.APPLICATION_NAME}  ************"
                     script {
-                        calculator.buildApp()
+                        calculator.mavenBuild()
                     }
                 }
             }
