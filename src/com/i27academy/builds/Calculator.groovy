@@ -29,6 +29,9 @@ class Calculator {
         # mvn package -DskipTests=true
         """
     }
+    def mavenBuild() {
+       return mvn package -DskipTests=true
+    }
 }
 
 
