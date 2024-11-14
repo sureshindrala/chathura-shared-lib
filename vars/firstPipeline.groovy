@@ -16,7 +16,7 @@ def call(Map pipelineParams) {
                     script {
                         echo "Calling Calculator Method from src folder"
                         echo "************ Printing the sum of values ************"
-                        println calculator.add(2,3)
+                        calculator.add(2,3)
                     }
                 }
             }
@@ -25,7 +25,7 @@ def call(Map pipelineParams) {
                     echo "Building the project"
                     echo "************ In Build Stage for ${env.APPLICATION_NAME}  ************"
                     script {
-                        calculator.mavenBuild()
+                        calculator.buildApp("${env.APPLICATION_NAME}")
                     }
                 }
             }
