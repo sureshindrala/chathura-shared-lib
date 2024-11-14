@@ -10,6 +10,9 @@ def call(Map pipelineParams) {
         environment {
             APPLICATION_NAME = "${pipelineParams.appName}"
         }
+        tools {
+            maven 'Maven_3.8.8'
+        }
         stages {
             stage ('Calculate') {
                 steps {
