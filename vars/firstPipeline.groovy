@@ -23,6 +23,9 @@ def call(Map pipelineParams) {
             stage ('Build') {
                 steps {
                     echo "Building the project"
+                    script {
+                        calculator.buildApp("${env.APPLICATION_NAME}")
+                    }
                 }
             }
             stage ('Test') {
