@@ -23,15 +23,14 @@ class Calculator {
     //     # mvn package -DskipTests=true
     //     """
     // }
-        def buildApp() {
+    //Application Build
+    def buildApp(appName) {
         jenkins.sh """
-        echo "Building the Maven for  project using shared lib"
-        # mvn package -DskipTests=true
+        echo "Building the Maven for $appName project using shared lib"
+        mvn package -DskipTests=true
         """
     }
-    def mavenBuild() {
-       return mvn package -DskipTests=true
-    }
+
 }
 
 
