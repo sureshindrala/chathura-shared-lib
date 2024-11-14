@@ -18,11 +18,12 @@ class Calculator {
         return firstNumber * secondNumber
     }   
 
-    // def buildApp() {
-    //     jenkins.sh """
-    //     mvn package -DskipTests=true
-    //     """
-    // }
+    def buildApp(appName) {
+        jenkins.sh """
+        echo "Building the Maven for $appName project using shared lib"
+        mvn package -DskipTests=true
+        """
+    }
 }
 
 
