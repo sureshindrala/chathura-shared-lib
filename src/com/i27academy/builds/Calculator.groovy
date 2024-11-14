@@ -2,8 +2,7 @@ package com.i27academy.builds;
 
 class Calculator {
     def jenkins
-
-    Calculator(jenkins) {
+    calculator(jenkins) {
         this.jenkins = jenkins
     }
 
@@ -18,11 +17,18 @@ class Calculator {
         return firstNumber * secondNumber
     }   
 
+    // def buildApp(appName) {
+    //     jenkins.sh """
+    //     echo "Building the Maven for $appName project using shared lib"
+    //     # mvn package -DskipTests=true
+    //     """
+    // }
         def buildApp() {
         jenkins.sh """
         echo "Building the Maven for  project using shared lib"
         # mvn package -DskipTests=true
         """
+    }
 }
 
 
