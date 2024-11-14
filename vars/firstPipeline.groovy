@@ -23,6 +23,7 @@ def call(Map pipelineParams) {
             stage ('Build') {
                 steps {
                     echo "Building the project"
+                    echo "************ In Build Stage for ${env.APPLICATION_NAME}  ************"
                     script {
                         calculator.buildApp("${env.APPLICATION_NAME}")
                     }
