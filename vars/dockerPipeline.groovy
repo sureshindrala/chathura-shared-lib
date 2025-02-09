@@ -68,7 +68,9 @@ pipeline {
             }
             // This is Where Build for Eureka application happens
             steps {
-                docker.buildApp("${env.APPLICATION_NAME}")
+                script{
+                    docker.buildApp("${env.APPLICATION_NAME}")
+                }
                 // echo "Building ${env.APPLICATION_NAME} Application"
                 // sh 'mvn clean package -DskipTests=true'
                 // // mvn clean package -DskipTests=true
