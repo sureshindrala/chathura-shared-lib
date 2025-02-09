@@ -47,6 +47,14 @@ def call(Map pipelineParams) {
         }
         environment {
             APPLICATION_NAME = "${pipelineParams.appName}"
+            // the below are hostports
+            DEV_HOST_PORT = "${pipelineParams.devHostPort}"
+            TST_HOST_PORT = "${pipelineParams.tstHostPort}"
+            STG__HOST_PORT = "${pipelineParams.stgHostPort}"
+            PROD__HOST_PORT = "${pipelineParams.prdHostPort}"
+
+            // the below are container ports
+            CONT_PORT = "${pipelineParams.contPort}"
             POM_VERSION = readMavenPom().getVersion() 
             POM_PACKAGING = readMavenPom().getPackaging()
             DOCKER_HUB = "docker.io/i27devopsb5"
