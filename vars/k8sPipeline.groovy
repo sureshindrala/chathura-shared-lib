@@ -68,7 +68,7 @@ def call(Map pipelineParams) {
                 steps {
                     echo "Executing in gcp gke project"
                     script {
-                        k8s.auth_login()
+                        k8s.auth_login("${env.DEV_CLUSTER_NAME}", "${env.DEV_CLUSTER_ZONE}", "${env.DEV_PROJECT_ID}")
 //                        k8s.auth_login("${env.DEV_CLUSTER_NAME}, ${env.DEV_CLUSTER_ZONE}, ${env.DEV_PROJECT_ID}")
                         //(clusterName, zone, projectID)
                     }

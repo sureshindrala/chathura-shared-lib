@@ -7,11 +7,12 @@ class K8s {
     }
 
     // Method to authenticate to kubernetes clusters
-    def auth_login(){
+    def auth_login(clusterName, zone, projectID){
         jenkins.sh """
             echo "********************* Entering into kubernetes Authentication/login Method *********************"
             gcloud compute instances list
             echo "********************* Create the config file for the environment *********************"  
+            gcloud container clusters get-credentials $clusterName --zone $zone --project $projectID
             kubectl get nodes 
         """
     }
