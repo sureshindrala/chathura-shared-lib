@@ -2,7 +2,7 @@ package com.i27academy.builds;
 class K8s {
 // write all the methods here 
     def jenkins
-    Docker(jenkins) {
+    K8s(jenkins) {
         this.jenkins = jenkins
     }
 
