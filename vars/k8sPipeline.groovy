@@ -61,19 +61,21 @@ def call(Map pipelineParams) {
             DEV_CLUSTER_NAME = "i27-cluster"
             DEV_CLUSTER_ZONE = "us-central1-a"
             DEV_PROJECT_ID = "plenary-magpie-445512-c3"
+
+            // K8s File names
+            K8S_DEV_FILE = "k8s_dev.yaml"
+            K8S_TST_FILE = "k8s_tst.yaml"
+            K8S_STG_FILE = "k8s_stg.yaml"
+            K8S_PRD_FILE = "k8s_prd.yaml"
+
+            // Namespace definiton
+            DEV_NAMESPACE = "cart-dev-ns"
+            TST_NAMESPACE = "cart-tst-ns"
+            STG_NAMESPACE = "cart-stg-ns"
+            PRD_NAMESPACE = "cart-prd-ns"
         }
 
         stages {
-            stage ('Authentication') {
-                steps {
-                    echo "Executing in gcp gke project"
-                    script {
-                        k8s.auth_login("${env.DEV_CLUSTER_NAME}", "${env.DEV_CLUSTER_ZONE}", "${env.DEV_PROJECT_ID}")
-//                        k8s.auth_login("${env.DEV_CLUSTER_NAME}, ${env.DEV_CLUSTER_ZONE}, ${env.DEV_PROJECT_ID}")
-                        //(clusterName, zone, projectID)
-                    }
-                }
-            }
             stage ('Build'){
                 when {
                     anyOf {
@@ -147,10 +149,21 @@ def call(Map pipelineParams) {
                 }
                 steps {
                     script {
+
+                        // this will create the docker image name
+                        def docker_image = "${env.DOCKER_HUB}/${env.APPLICATION_NAME}:${GIT_COMMIT}"
+                        
+                        // this will login to the kubernetes cluster
+                        k8s.auth_login("${env.DEV_CLUSTER_NAME}", "${env.DEV_CLUSTER_ZONE}", "${env.DEV_PROJECT_ID}")
+
+                        // this will validate the image and pull the image if it is not available
                         imageValidation().call()
-                        //dockerDeploy('dev', "${env.DEV_HOST_PORT}", "${env.CONT_PORT}").call()
+
+                        // Deploying to Kubernetes cluster in dev namespace 
+                        k8s.k8sdeploy("${env.K8S_DEV_FILE}", docker_image, "${env.DEV_NAMESPACE}")
+                        
                     }
-    
+    //(fileName, docker_image, namespace)
                 }
                 // a mail should trigger based on the status
                 // Jenkins url should be sent as an a email.
