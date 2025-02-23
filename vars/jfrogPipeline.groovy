@@ -279,7 +279,7 @@ def dockerBuildAndPush(){
         sh "docker build --no-cache --build-arg JAR_SOURCE=i27-${env.APPLICATION_NAME}-${env.POM_VERSION}.${env.POM_PACKAGING} -t ${env.JFROG_DOCKER_REGISTRY}/${env.JFROG_DOCKER_REPO_NAME}/${env.APPLICATION_NAME}:${GIT_COMMIT} ./.cicd/"
         // devopsb5.jfrog.io/cart-docker/eureka:GIT_COMMIT
         echo "****************** Login to Jfrog Registry ******************"
-        sh "docker login -u ${JFROG_CREDS_USR} -p ${JFROG_CREDS_PSW}"
+        sh "docker login -u ${JFROG_CREDS_USR} -p ${JFROG_CREDS_PSW} devopsb5.jfrog.io"
         echo "****************** Push Image to JFROG Registry ******************"
         sh "docker push ${env.JFROG_DOCKER_REGISTRY}/${env.JFROG_DOCKER_REPO_NAME}/${env.APPLICATION_NAME}:${GIT_COMMIT}"
     }
