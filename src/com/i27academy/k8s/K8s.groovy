@@ -27,7 +27,7 @@ class K8s {
     }
 
     // Helm Deployments 
-    def k8sHelmChartDeploy(appName, env, helmChartPath, imageTag, namspace){ 
+    def k8sHelmChartDeploy(appName, env, helmChartPath, imageTag, namespace){ 
         jenkins.sh """
             echo "********************* Entering into kubernetes Helm Deployment Method *********************"
             helm version
