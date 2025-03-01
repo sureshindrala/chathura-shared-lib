@@ -32,7 +32,16 @@ class K8s {
             echo "********************* Entering into kubernetes Helm Deployment Method *********************"
             helm version
             echo "********************* Installing the Chart *********************"
-            helm install ${appName}-${env}-chart -f .cicd/helm_values/values_${env}.yaml --set image.tag=${imageTag} ${helmChartPath} -n ${namespace}
+            # Lets verify it the helm chart exists
+            if helm list -n ${namespace} | grep -q ${appName}-${env}-chart; then
+                echo "This Chart Exists"
+                echo "Upgrading the Chart"
+                helm upgrade ${appName}-${env}-chart -f .cicd/helm_values/values_${env}.yaml --set image.tag=${imageTag} ${helmChartPath} -n ${namespace}
+            else
+                echo "This Chart does not exist"
+                echo "Installing the Chart"
+                helm install ${appName}-${env}-chart -f .cicd/helm_values/values_${env}.yaml --set image.tag=${imageTag} ${helmChartPath} -n ${namespace}
+            fi
         """
     }
 
