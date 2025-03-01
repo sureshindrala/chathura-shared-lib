@@ -42,6 +42,8 @@ class K8s {
             git clone -b main https://github.com/i27devopsb5/i27-shared-lib.git
             echo "********************* Listing the files in the workspace*********************"
             ls -la 
+            echo "********************* Listing the files in the shared library*********************"
+            ls -la i27-shared-lib
         """
     }
 }
