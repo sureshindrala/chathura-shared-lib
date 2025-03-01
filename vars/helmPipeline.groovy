@@ -280,7 +280,7 @@ def call(Map pipelineParams) {
     }
     // This Jenkins file is for Eureka Deployment
 
-
+}
 
 //App Building
 def buildApp(){
@@ -350,4 +350,4 @@ def dockerDeploy(envDeploy, hostPort, contPort){
     }
 }
 
-}
+
