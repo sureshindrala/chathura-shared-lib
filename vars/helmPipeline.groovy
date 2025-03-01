@@ -274,11 +274,11 @@ def call(Map pipelineParams) {
                     else {
                         echo "Shared library directory does not exist: ${sharedLibDir}, seems already cleandup"
                     }
+                }
             }
         }
     }
-}
-// This Jenkins file is for Eureka Deployment
+    // This Jenkins file is for Eureka Deployment
 
 
 
@@ -350,10 +350,4 @@ def dockerDeploy(envDeploy, hostPort, contPort){
     }
 }
 
-
-// For eureka lets use the below port numbers
-// Container port will be 8232 only, only host port changes
-// dev: HostPort = 5232
-// tst: HostPort = 6232
-// stg: HostPort = 7232
-// prod: HostPort = 8232
+}
