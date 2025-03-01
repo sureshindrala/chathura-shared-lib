@@ -91,12 +91,6 @@ def call(Map pipelineParams) {
         }
 
         stages {
-            stage('Clean') {
-                steps {
-                    echo "Cleaning up the workspace"
-                    cleanWs()
-                }
-            }
             stage('CheckoutSharedLib'){
                 steps {
                     script {
@@ -191,10 +185,10 @@ def call(Map pipelineParams) {
                         //appName, env, helmChartPath, imageTag, namspace
                         
                     }
-    //(fileName, docker_image, namespace)
-                }
-                // a mail should trigger based on the status
-                // Jenkins url should be sent as an a email.
+                    //(fileName, docker_image, namespace)
+                                }
+                                // a mail should trigger based on the status
+                                // Jenkins url should be sent as an a email.
             }
             stage ('Deploy to Test Env'){
                 when {
@@ -261,11 +255,25 @@ def call(Map pipelineParams) {
                     }
                 }
             }
-            stage('Cleanlast') {
+            stage('Clean') {
                 steps {
                     echo "Cleaning up the workspace"
                     cleanWs()
                 }
+            }
+        }
+        post {
+            always {
+                echo "Cleaning up the i27-shared-lib directory"
+                script {
+                    def sharedLibDir = "${workspace}/i27-shared-lib"
+                    if (fileExists(sharedLibDir)) {
+                        echo "Deleting the shared library directory: ${sharedLibDir}"
+                        sh "rm -rf ${sharedLibDir}"
+                    }
+                    else {
+                        echo "Shared library directory does not exist: ${sharedLibDir}, seems already cleandup"
+                    }
             }
         }
     }
