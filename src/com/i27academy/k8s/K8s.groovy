@@ -27,11 +27,25 @@ class K8s {
     }
 
     // Helm Deployments 
-    def k8sHelmChartDeploy() {
+    def k8sHelmChartDeploy(appName, env) {
         jenkins.sh """
             echo "********************* Entering into kubernetes Helm Deployment Method *********************"
             helm version
+            echo "********************* Installing the Chart *********************"
+        """
+    }
+
+    // CLone the Shared Library
+    def gitClone(){
+        jenkins.sh """
+            echo "********************* Cloning the Shared Library *********************"
+            git clone -b main https://github.com/i27devopsb5/i27-shared-lib.git
+            echo "********************* Listing the files in the workspace*********************"
+            ls -la 
         """
     }
 }
 
+//            helm install ${appName}-${env}-chart -f values_dev.yaml --set image.tag={****} chartpath -n cart-dev-ns  
+
+          //  helm upgrade 

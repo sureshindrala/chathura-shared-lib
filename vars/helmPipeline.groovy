@@ -81,6 +81,13 @@ def call(Map pipelineParams) {
         }
 
         stages {
+            stage('CheckoutSharedLib'){
+                steps {
+                    script {
+                        k8s.gitClone()
+                    }
+                }
+            }
             stage ('Build'){
                 when {
                     anyOf {
@@ -163,7 +170,6 @@ def call(Map pipelineParams) {
                         // this will validate the image and pull the image if it is not available
                         imageValidation().call()
 
-                        
                         // Deplos using helm charts
                         k8s.k8sHelmChartDeploy()
                         
