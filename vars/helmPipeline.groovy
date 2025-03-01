@@ -261,7 +261,7 @@ def call(Map pipelineParams) {
                     }
                 }
             }
-            stage('Clean') {
+            stage('Cleanlast') {
                 steps {
                     echo "Cleaning up the workspace"
                     cleanWs()
