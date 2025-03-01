@@ -91,6 +91,12 @@ def call(Map pipelineParams) {
         }
 
         stages {
+            stage('Clean') {
+                steps {
+                    echo "Cleaning up the workspace"
+                    cleanWs()
+                }
+            }
             stage('CheckoutSharedLib'){
                 steps {
                     script {
