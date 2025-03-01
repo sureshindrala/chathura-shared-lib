@@ -78,6 +78,16 @@ def call(Map pipelineParams) {
             JFROG_DOCKER_REGISTRY = "devopsb5.jfrog.io"
             JFROG_DOCKER_REPO_NAME = "cart-docker"
             JFROG_CREDS = credentials('JFROG_CREDS') // credentials to connect to my private JFROG
+
+            // Environment Details
+            DEV_ENV = "dev"
+            TST_ENV = "tst"
+            STG_ENV = "stg"
+            PRD_ENV = "prd"
+
+            // Chart path details
+            HELM_CHART_PATH = "${workspace}/i27-shared-lib/chart"
+
         }
 
         stages {
@@ -171,7 +181,8 @@ def call(Map pipelineParams) {
                         imageValidation().call()
 
                         // Deplos using helm charts
-                        k8s.k8sHelmChartDeploy()
+                        k8s.k8sHelmChartDeploy("${env.APPLICATION_NAME}", "${DEV_ENV}", "${HELM_CHART_PATH}", "${GIT_COMMIT}", "${env.DEV_NAMESPACE}")
+                        //appName, env, helmChartPath, imageTag, namspace
                         
                     }
     //(fileName, docker_image, namespace)
