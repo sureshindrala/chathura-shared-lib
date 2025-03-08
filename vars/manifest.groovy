@@ -1,5 +1,5 @@
-import com.i27academy.builds.Docker
-import com.i27academy.k8s.K8s
+import com.i27academy.builds.Docker;
+import com.i27academy.k8s.K8s;
 
 
 def call(Map pipelineParams){
@@ -54,7 +54,7 @@ def call(Map pipelineParams){
                 steps {
                     echo "Executing in GCP Cloud authentication stage"
                     script{
-                        k8s.auth_login()
+                        k8s.auth_login("${env.DEV_CLUSTER_NAME}", "${env.DEV_CLUSTER_ZONE}", "${env.DEV_PROJECT_ID}")
                     }
                 }
             }
