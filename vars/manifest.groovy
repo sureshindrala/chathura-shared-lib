@@ -17,6 +17,11 @@ def call(Map pipelineParams){
             string(name: 'NAMESPACE_NAME', description: "Enter the name of the namespace, you want to create")
         }
         environment {
+            // these are kubernetes details
+            DEV_CLUSTER_NAME = "i27-cluster"
+            DEV_CLUSTER_ZONE = "us-central1-a"
+            DEV_PROJECT_ID = "plenary-magpie-445512-c3"
+            
             APPLICATION_NAME = "${pipelineParams.appName}"
             SONAR_URL = "http://35.196.148.247:9000"
             SONAR_TOKEN = credentials('sonar_creds')
