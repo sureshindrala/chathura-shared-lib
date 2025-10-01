@@ -1,6 +1,6 @@
 package com.chathura.builds;
 class Docker {
-// write all the methods here 
+// write all the methods here docker 
     def jenkins
     Docker(jenkins) {
         this.jenkins = jenkins
