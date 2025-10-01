@@ -36,7 +36,7 @@ pipeline {
     }
     environment {
         APPLICATION_NAME = "${pipelineParams.appName}"
-        SONAR_HOST= 'http://34.172.162.27:9000'
+                SONAR_HOST= 'http://34.172.162.27:9000'
         POM_VERSION = readMavenPom().getVersion()
         POM_PACKAGING = readMavenPom().getPackaging()
         DOCKER_HUB = "docker.io/sureshindrala"
@@ -56,8 +56,9 @@ pipeline {
             }
             steps {
                 echo "*********************Build ${env.APPLICATION_NAME}*************************"
-                sh 'mvn clean package -DskipTest=true'
-                archive 'target/*.jar'
+                docker.buildApp("${env.APPLICATION_NAME}")
+                // sh 'mvn clean package -DskipTest=true'
+                // archive 'target/*.jar'
             }
 
         }
