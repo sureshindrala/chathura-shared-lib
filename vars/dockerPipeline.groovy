@@ -248,7 +248,7 @@ def dockerBuildandPush() {
     }
 }
 
-def dockerdeploy(envDeploy,envPort) {
+def dockerDeploy(envDeploy,envPort) {
     return{
     withCredentials([usernamePassword(credentialsId: 'docker_vm_creds', 
         passwordVariable: 'PASSWORD', 
