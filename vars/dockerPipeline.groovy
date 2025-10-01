@@ -2,8 +2,7 @@ import com.chathura.builds.Docker;
 
 def call(Map pipelineParams) {
     Docker docker = newDocker(this)
-}
-pipeline {
+        pipeline {
     agent {
         label 'k8s-slave'
     }
@@ -36,7 +35,7 @@ pipeline {
     }
     environment {
         APPLICATION_NAME = "${pipelineParams.appName}"
-                SONAR_HOST= 'http://34.172.162.27:9000'
+        SONAR_HOST= 'http://34.172.162.27:9000'
         POM_VERSION = readMavenPom().getVersion()
         POM_PACKAGING = readMavenPom().getPackaging()
         DOCKER_HUB = "docker.io/sureshindrala"
@@ -195,6 +194,9 @@ pipeline {
         }                        
     }
 }
+        
+}
+
 
 def buildApp(){
     return {
