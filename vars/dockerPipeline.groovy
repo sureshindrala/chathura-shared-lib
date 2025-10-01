@@ -34,13 +34,7 @@ def call(Map pipelineParams) {
             )                                            
         }
         environment {
-            APPLICATION_NAME = "${pipelineParams.appName}"
-             // the below are hostports
-            DEV_HOST_PORT = "${pipelineParams.devHostPort}"
-            TST_HOST_PORT = "${pipelineParams.tstHostPort}"
-            STG__HOST_PORT = "${pipelineParams.stgHostPort}"
-            PROD__HOST_PORT = "${pipelineParams.prdHostPort}"
-            CONT_PORT = "${pipelineParams.contPort}"
+            APPLICATION_NAME = "eureka"
             SONAR_HOST= 'http://34.172.162.27:9000'
             POM_VERSION = readMavenPom().getVersion()
             POM_PACKAGING = readMavenPom().getPackaging()
@@ -61,12 +55,8 @@ def call(Map pipelineParams) {
                 }
                 steps {
                     echo "*********************Build ${env.APPLICATION_NAME}*************************"
-                    script {
-                    docker.buildApp("${env.APPLICATION_NAME}")
-                    }
-
-                    // sh 'mvn clean package -DskipTest=true'
-                    // archive 'target/*.jar'
+                    sh 'mvn clean package -DskipTest=true'
+                    archive 'target/*.jar'
                 }
 
             }
@@ -84,7 +74,7 @@ def call(Map pipelineParams) {
                     withCredentials([string(credentialsId: 'sonar_creds', variable: 'sonar_creds')]) {
                         sh """
                             mvn sonar:sonar \
-                            -Dsonar.projectKey=chathura-${env.APPLICATION_NAME} \
+                            -Dsonar.projectKey=chathura-eureka \
                             -Dsonar.host.url=$SONAR_HOST \
                             -Dsonar.login=$sonar_creds
                         """
@@ -135,7 +125,7 @@ def call(Map pipelineParams) {
                 steps {
                     script {
                         imageValidation().call()
-                        dockerDeploy('dev', "${env.DEV_HOST_PORT}", "${env.CONT_PORT}").call()
+                        dockerdeploy('dev','5761').call()
                     }
                 }
             }
@@ -150,7 +140,7 @@ def call(Map pipelineParams) {
                 steps {
                     script {
                         imageValidation().call()
-                        dockerDeploy('test', "${env.TST_HOST_PORT}", "${env.CONT_PORT}").call()
+                        dockerdeploy('test','6232').call()
                     }
                 }
             }
@@ -172,7 +162,7 @@ def call(Map pipelineParams) {
                 steps {
                     script {
                         imageValidation().call()
-                        dockerDeploy('dev', "${env.STG__HOST_PORT}", "${env.CONT_PORT}").call()
+                        dockerdeploy('stage','7232').call()
                     }
                 }
             }
@@ -191,22 +181,20 @@ def call(Map pipelineParams) {
 
                 }
                 steps {
-                    timeout(time: 300, unit: 'SECONDS') { // SECONDS, MINUTES, HOURS//
+                    timeout(time: 300, unit: 'SECONDS') { // SECONDS, MINUTES, HOURS
                         input message: "Deploying ${env.APPLICATION_NAME} to production ??", 
                             ok: 'Yes', 
                             submitter: 'suresh'
                     }
                     script {
-                        dockerDeploy('dev', "${env.PROD__HOST_PORT}", "${env.CONT_PORT}").call()
+                        dockerdeploy('prod', '8232').call()
                     }
                 }
             }                        
         }
     }
-            
+                
     }
-
-
 def buildApp(){
     return {
         echo "Building ${env.APPLICATION_NAME} Application"
@@ -248,7 +236,7 @@ def dockerBuildandPush() {
     }
 }
 
-def dockerDeploy(envDeploy,envPort) {
+def dockerdeploy(envDeploy,envPort) {
     return{
     withCredentials([usernamePassword(credentialsId: 'docker_vm_creds', 
         passwordVariable: 'PASSWORD', 
@@ -262,7 +250,7 @@ def dockerDeploy(envDeploy,envPort) {
 
             // Run new container
             sh """
-            sshpass -p "$PASSWORD" ssh -o StrictHostKeyChecking=no "$USERNAME"@"${env.DOCKER_SERVER}" "docker container run -dit -p ${envPort}:${env.CONT_PORT} --name ${env.APPLICATION_NAME}-${envDeploy} ${env.DOCKER_HUB}/${env.APPLICATION_NAME}:${GIT_COMMIT}"
+            sshpass -p "$PASSWORD" ssh -o StrictHostKeyChecking=no "$USERNAME"@"${env.DOCKER_SERVER}" "docker container run -dit -p ${envPort}:8761 --name ${env.APPLICATION_NAME}-${envDeploy} ${env.DOCKER_HUB}/${env.APPLICATION_NAME}:${GIT_COMMIT}"
             sshpass -p "$PASSWORD" ssh -o StrictHostKeyChecking=no "$USERNAME"@"${env.DOCKER_SERVER}" "docker ps"
             """
         } catch (err) {
@@ -272,8 +260,4 @@ def dockerDeploy(envDeploy,envPort) {
     }
 }
 
-// Container port will be 8232 only, only host port changes
-// dev: HostPort = 5232
-// tst: HostPort = 6232
-// stg: HostPort = 7232
-// prod: HostPort = 8232
+
