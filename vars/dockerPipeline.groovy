@@ -34,7 +34,13 @@ def call(Map pipelineParams) {
             )                                            
         }
         environment {
-            APPLICATION_NAME = "eureka"
+            APPLICATION_NAME = "${pipelineParams.appName}"
+            // the below are hostports
+            DEV_HOST_PORT = "${pipelineParams.devHostPort}"
+            TST_HOST_PORT = "${pipelineParams.tstHostPort}"
+            STG__HOST_PORT = "${pipelineParams.stgHostPort}"
+            PROD__HOST_PORT = "${pipelineParams.prdHostPort}"
+            CONT_PORT = "${pipelineParams.contPort}"
             SONAR_HOST= 'http://34.172.162.27:9000'
             POM_VERSION = readMavenPom().getVersion()
             POM_PACKAGING = readMavenPom().getPackaging()
@@ -125,7 +131,7 @@ def call(Map pipelineParams) {
                 steps {
                     script {
                         imageValidation().call()
-                        dockerdeploy('dev','5761').call()
+                        dockerdeploy('dev', "${env.DEV_HOST_PORT}", "${env.CONT_PORT}").call()
                     }
                 }
             }
@@ -140,7 +146,7 @@ def call(Map pipelineParams) {
                 steps {
                     script {
                         imageValidation().call()
-                        dockerdeploy('test','6232').call()
+                        dockerdeploy('dev', "${env.TST_HOST_PORT}", "${env.CONT_PORT}").call()
                     }
                 }
             }
@@ -162,7 +168,7 @@ def call(Map pipelineParams) {
                 steps {
                     script {
                         imageValidation().call()
-                        dockerdeploy('stage','7232').call()
+                        dockerdeploy('dev', "${env.STG__HOST_PORT}", "${env.CONT_PORT}").call()
                     }
                 }
             }
@@ -187,7 +193,7 @@ def call(Map pipelineParams) {
                             submitter: 'suresh'
                     }
                     script {
-                        dockerdeploy('prod', '8232').call()
+                        dockerdeploy('dev', "${env.PROD__HOST_PORT}", "${env.CONT_PORT}").call()
                     }
                 }
             }                        
@@ -236,7 +242,7 @@ def dockerBuildandPush() {
     }
 }
 
-def dockerdeploy(envDeploy,envPort) {
+def dockerdeploy(envDeploy,envPort,conPort) {
     return{
     withCredentials([usernamePassword(credentialsId: 'docker_vm_creds', 
         passwordVariable: 'PASSWORD', 
@@ -250,7 +256,7 @@ def dockerdeploy(envDeploy,envPort) {
 
             // Run new container
             sh """
-            sshpass -p "$PASSWORD" ssh -o StrictHostKeyChecking=no "$USERNAME"@"${env.DOCKER_SERVER}" "docker container run -dit -p ${envPort}:8761 --name ${env.APPLICATION_NAME}-${envDeploy} ${env.DOCKER_HUB}/${env.APPLICATION_NAME}:${GIT_COMMIT}"
+            sshpass -p "$PASSWORD" ssh -o StrictHostKeyChecking=no "$USERNAME"@"${env.DOCKER_SERVER}" "docker container run -dit -p ${envPort}:${conPort} --name ${env.APPLICATION_NAME}-${envDeploy} ${env.DOCKER_HUB}/${env.APPLICATION_NAME}:${GIT_COMMIT}"
             sshpass -p "$PASSWORD" ssh -o StrictHostKeyChecking=no "$USERNAME"@"${env.DOCKER_SERVER}" "docker ps"
             """
         } catch (err) {
