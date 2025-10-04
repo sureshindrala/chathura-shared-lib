@@ -61,7 +61,7 @@ def call(Map pipelineParams) {
                 }
                 steps {
                     echo "*********************Build ${env.APPLICATION_NAME}*************************"
-                    sh 'mvn clean package -DskipTest=true'
+                    sh 'mvn clean package -DskipTests=true'
                     archive 'target/*.jar'
                 }
 
