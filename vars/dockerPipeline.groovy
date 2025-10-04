@@ -80,7 +80,7 @@ def call(Map pipelineParams) {
                     withCredentials([string(credentialsId: 'sonar_creds', variable: 'sonar_creds')]) {
                         sh """
                             mvn sonar:sonar \
-                            -Dsonar.projectKey=chathura-eureka \
+                            -Dsonar.projectKey=chathura-${env.APPLICATION_NAME} \
                             -Dsonar.host.url=$SONAR_HOST \
                             -Dsonar.login=$sonar_creds
                         """
