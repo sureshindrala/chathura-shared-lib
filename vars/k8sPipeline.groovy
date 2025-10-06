@@ -54,10 +54,18 @@ def call(Map pipelineParams) {
 
             DEV_CLUSTER_NAME = "chathura-cluster"
             DEV_CLUSTER_ZONE = "us-central1-a"
-            DEV_PROJECT_ID = "plenary-magpie-445512-c3"
+            DEV_PROJECT_ID = "chathura-project"
 
         }
         stages{
+            stage('Authentication') {
+                steps{
+                    echo "*********Authentication GKE*****************88"
+                    script {
+                        k8s.auth_login("${env.DEV_CLUSTER_NAME}" "${env.DEV_CLUSTER_ZONE}" "${env.DEV_PROJECT_ID}")
+                    }
+                }
+            }
             stage('Build'){
                 when {
                     anyOf {
