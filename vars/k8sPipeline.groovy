@@ -57,11 +57,11 @@ def call(Map pipelineParams) {
             DEV_CLUSTER_ZONE = "us-central1-a"
             DEV_PROJECT_ID = "chathura-project"
 
-        //*******KUBERNETES YAML FILE************
-            K8S_DEV_FILE = "k8s_dev.yaml"
-            K8S_TST_FILE = "k8s_test.yaml"
-            K8S_STG_FILE = "k8s_stage.yaml"
-            K8S_PRD_FILE = "k8s_prod.yaml"
+        //*******KUBERNETES yml FILE************
+            K8S_DEV_FILE = "k8s_dev.yml"
+            K8S_TST_FILE = "k8s_test.yml"
+            K8S_STG_FILE = "k8s_stage.yml"
+            K8S_PRD_FILE = "k8s_prod.yml"
 
         // *******KUBERNETES NAMESPACES*******
             DEV_NAMESPACE = "dev-cart-ns"
