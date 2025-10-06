@@ -52,20 +52,33 @@ def call(Map pipelineParams) {
             DOCKER_CREDS = credentials('dockerhub_sureshindrala_creds')
             DOCKER_SERVER= "136.114.27.219"
 
+        // *******Kubernetes cluster**********
             DEV_CLUSTER_NAME = "chathura-cluster"
             DEV_CLUSTER_ZONE = "us-central1-a"
             DEV_PROJECT_ID = "chathura-project"
 
+        //*******KUBERNETES YAML FILE************
+            K8S_DEV_FILE = "k8s_dev.yaml"
+            K8S_TST_FILE = "k8s_test.yaml"
+            K8S_STG_FILE = "k8s_stage.yaml"
+            K8S_PRD_FILE = "k8s_prod.yaml"
+
+        // *******KUBERNETES NAMESPACES*******
+            DEV_NAMESPACE = "dev-cart-ns"
+            TST_NAMESPACE = "test-cart-ns"
+            STG_NAMESPACE = "stage-cart-ns"
+            PRD_NAMESPACE = "prod-cart-ns"
+
         }
         stages{
-            stage('Authentication') {
-                steps{
-                    echo "*********Authentication GKE*****************88"
-                    script {
-                        k8s.auth_login("${env.DEV_CLUSTER_NAME}","${env.DEV_CLUSTER_ZONE}","${env.DEV_PROJECT_ID}")
-                    }
-                }
-            }
+            // stage('Authentication') {
+            //     steps{
+            //         echo "*********Authentication GKE*****************"
+            //         script {
+            //             k8s.auth_login("${env.DEV_CLUSTER_NAME}","${env.DEV_CLUSTER_ZONE}","${env.DEV_PROJECT_ID}")
+            //         }
+            //     }
+            // }
             stage('Build'){
                 when {
                     anyOf {
@@ -146,10 +159,21 @@ def call(Map pipelineParams) {
                 }
                 steps {
                     script {
-                        echo "**************k8s-login*********************"
+                        // this will create docker image///
+                        def docker_image = "${env.DOCKER_HUB}/${env.APPLICATION_NAME}:${GIT_COMMIT}"
+                        
+                        echo "**************k8s-login to cluster*********************"
                         k8s.auth_login("${env.DEV_CLUSTER_NAME}", "${env.DEV_CLUSTER_ZONE}", "${env.DEV_PROJECT_ID}")
+
+                        // this will validate the image
+
                         imageValidation().call()
-                        dockerdeploy('dev', "${env.DEV_HOST_PORT}", "${env.CONT_PORT}").call()
+
+                        // Deploying to Kubernetes cluster in dev namespace 
+
+                        k8s.k8sdeploy("${env.K8S_DEV_FILE}", docker_image, "${env.DEV_NAMESPACE}")
+
+                        // dockerdeploy('dev', "${env.DEV_HOST_PORT}", "${env.CONT_PORT}").call()
                     }
                 }
             }
