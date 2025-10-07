@@ -171,14 +171,6 @@ def call(Map pipelineParams) {
     }
                 
     }
-def buildApp(){
-    return {
-        echo "Building ${env.APPLICATION_NAME} Application"
-        sh 'mvn clean package -DSkipTests=true'
-    }
-}
-
-
 
 def imageValidation() {
     return {
@@ -189,7 +181,6 @@ def imageValidation() {
         }
         catch(Exception e) {
             println("*************OOPS..!*****The docker image with this tag is not avaliable in this repo, So creating the Image****")
-            buildApp().call()
             dockerBuildandPush().call()
 
         }
