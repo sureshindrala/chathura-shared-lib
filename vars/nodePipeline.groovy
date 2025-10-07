@@ -191,7 +191,7 @@ def dockerBuildandPush() {
     return {
         echo "*****************building Docker image***********************"
         sh """
-            docker build --no-cache  -t ${env.DOCKER_HUB}/${env.APPLICATION_NAME}:${GIT_COMMIT}  ./.cicd
+            docker build --no-cache  -t ${env.DOCKER_HUB}/${env.APPLICATION_NAME}:${GIT_COMMIT} .
             echo "***********Docker login***********************"
             docker login -u ${DOCKER_CREDS_USR} -p ${DOCKER_CREDS_PSW} 
             docker push ${env.DOCKER_HUB}/${env.APPLICATION_NAME}:${GIT_COMMIT}
