@@ -9,7 +9,7 @@ def call(Map pipelineParams) {
         agent {
             label 'k8s-slave'
         }
-
+        parameters {
             choice (name: 'buildOnly',
                 choices: 'no\nyes',
             )
