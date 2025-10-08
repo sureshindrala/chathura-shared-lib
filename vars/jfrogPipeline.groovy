@@ -280,7 +280,7 @@ def dockerBuildandPush() {
             ls -la ./.cicd
             docker build --force-rm --no-cache --pull --rm=true --build-arg JAR_SOURCE=chathura-${env.APPLICATION_NAME}-${env.POM_VERSION}.${env.POM_PACKAGING} -t ${env.JFROG_DOCKER_REGISTRY}/${env.JFROG_DOCKER_REPO_NAME}/${env.APPLICATION_NAME}:${GIT_COMMIT}  ./.cicd
             echo "***********Login to Jfrog Registry***********************"
-            docker login -u ${JFROG_CREDS_USR} -p ${JFROG_CREDS_PSW}
+            docker login -u ${JFROG_CREDS_USR} -p ${JFROG_CREDS_PSW} trialbc0u3p.jfrog.io
             echo "****************** Push Image to JFROG Registry ******************" 
             docker push ${env.JFROG_DOCKER_REGISTRY}/${env.JFROG_DOCKER_REPO_NAME}/${env.APPLICATION_NAME}:${GIT_COMMIT}
 
