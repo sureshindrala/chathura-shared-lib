@@ -162,14 +162,15 @@ def call(Map pipelineParams) {
                         // this will create docker image///
                         def docker_image = "${env.DOCKER_HUB}/${env.APPLICATION_NAME}:${GIT_COMMIT}"
                         
-                        //echo "**************k8s-login to cluster*********************"
-                        //k8s.auth_login("${env.DEV_CLUSTER_NAME}", "${env.DEV_CLUSTER_ZONE}", "${env.DEV_PROJECT_ID}")
+                        echo "**************k8s-login to cluster*********************"
+                        k8s.auth_login("${env.DEV_CLUSTER_NAME}", "${env.DEV_CLUSTER_ZONE}", "${env.DEV_PROJECT_ID}")
 
                         // this will validate the image
 
-                         k8sHelmChartDeploy()
-
+                         
                         imageValidation().call()
+
+                        k8sHelmChartDeploy()
                        
 
                         echo "************Deploying Using Helm Charts****************" 
