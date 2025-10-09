@@ -25,4 +25,10 @@ class K8s {
             kubectl apply -f ./.cicd/${fileName} -n $namespace
         """
     }
+        def k8sHelmChartDeploy(appName, env, helmChartPath, imageTag, namespace){ 
+        jenkins.sh """
+            echo "********************* Entering into kubernetes Helm Deployment Method *********************"
+            helm version
+        """
+    }
 }
