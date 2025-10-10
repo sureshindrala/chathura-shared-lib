@@ -79,7 +79,7 @@ def call(Map pipelineParams) {
             
         }
         stages{
-            
+
             stage('CheckoutSharedLib'){
                 steps {
                     script {
@@ -87,14 +87,6 @@ def call(Map pipelineParams) {
                     }
                 }
             }            
-            // stage('Authentication') {
-            //     steps{
-            //         echo "*********Authentication GKE*****************"
-            //         script {
-            //             k8s.auth_login("${env.DEV_CLUSTER_NAME}","${env.DEV_CLUSTER_ZONE}","${env.DEV_PROJECT_ID}")
-            //         }
-            //     }
-            // }
             stage('Build'){
                 when {
                     anyOf {
