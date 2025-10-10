@@ -17,7 +17,7 @@ class K8s {
         """
     }
 
-    // Method to deploy the application. 
+    // Method to deploy the application. added Captilc
     def k8sdeploy(fileName, docker_image, namespace){
         jenkins.sh """
             echo "********************* Entering into kubernetes Deployment Method *********************"
