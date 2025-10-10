@@ -79,6 +79,14 @@ def call(Map pipelineParams) {
             
         }
         stages{
+            
+            stage('CheckoutSharedLib'){
+                steps {
+                    script {
+                        k8s.gitClone()
+                    }
+                }
+            }            
             // stage('Authentication') {
             //     steps{
             //         echo "*********Authentication GKE*****************"
