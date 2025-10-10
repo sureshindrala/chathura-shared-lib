@@ -68,6 +68,9 @@ def call(Map pipelineParams) {
             TST_NAMESPACE = "test-cart-ns"
             STG_NAMESPACE = "stage-cart-ns"
             PRD_NAMESPACE = "prod-cart-ns"
+        
+        // Chart details
+            HELM_CHART_PATH = "${workspace}/chathura-shared-lib/chart"
             
         }
         stages{
@@ -128,9 +131,9 @@ def call(Map pipelineParams) {
                             
 
             //                 """
-            //                 // sh "cp ${workspace}/target/i27-${env.APPLICATION_NAME}-${env.POM_VERSION}.${env.POM_PACKAGING} ./.cicd"
+            //                 // sh "cp ${workspace}/target/chathura-${env.APPLICATION_NAME}-${env.POM_VERSION}.${env.POM_PACKAGING} ./.cicd"
             //                 // sh "ls -la ./.cicd"
-            //                 // sh "docker build --force-rm --no-cache --pull --rm=true --build-arg JAR_SOURCE=i27-${env.APPLICATION_NAME}-${env.POM_VERSION}.${env.POM_PACKAGING} -t ${env.DOCKER_HUB}/${env.APPLICATION_NAME}:${GIT_COMMIT} ./.cicd "
+            //                 // sh "docker build --force-rm --no-cache --pull --rm=true --build-arg JAR_SOURCE=chathura-${env.APPLICATION_NAME}-${env.POM_VERSION}.${env.POM_PACKAGING} -t ${env.DOCKER_HUB}/${env.APPLICATION_NAME}:${GIT_COMMIT} ./.cicd "
             //             }
             //         }
             //     }
@@ -171,7 +174,7 @@ def call(Map pipelineParams) {
                         imageValidation().call()                                         
 
                         echo "************Deploying Using Helm Charts****************"
-                        k8s.HelmChartDeploy()    
+                        k8s.k8sHelmChartDeploy("${env.APPLICATION_NAME}", "${DEV_ENV}", "${HELM_CHART_PATH}", "${GIT_COMMIT}", "${env.DEV_NAMESPACE}")
                         //  sh "helm version" 
                         //k8s.k8sHelmChartDeploy("${env.APPLICATION_NAME}", "${DEV_ENV}", "${HELM_CHART_PATH}", "${GIT_COMMIT}", "${env.DEV_NAMESPACE}")
 
@@ -242,11 +245,33 @@ def call(Map pipelineParams) {
                         dockerdeploy('dev', "${env.PROD__HOST_PORT}", "${env.CONT_PORT}").call()
                     }
                 }
-            }                        
+            }
+            stage('Clean') {
+                steps {
+                    echo "Cleaning up the workspace"
+                    cleanWs()
+                }
+            }
         }
+            post {
+                always {
+                    echo "Cleaning up the chathura-shared-lib directory"
+                    script {
+                        def sharedLibDir = "${workspace}/chathura-shared-lib"
+                        if (fileExists(sharedLibDir)) {
+                            echo "Deleting the shared library directory: ${sharedLibDir}"
+                            sh "rm -rf ${sharedLibDir}"
+                        }
+                        else {
+                            echo "Shared library directory does not exist: ${sharedLibDir}, seems already cleandup"
+                        }
+                    }
+                 }
+        }                                    
     }
+}
                 
-    }
+    
 def buildApp(){
     return {
         echo "Building ${env.APPLICATION_NAME} Application"
