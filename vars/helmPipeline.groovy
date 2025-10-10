@@ -68,6 +68,11 @@ def call(Map pipelineParams) {
             TST_NAMESPACE = "test-cart-ns"
             STG_NAMESPACE = "stage-cart-ns"
             PRD_NAMESPACE = "prod-cart-ns"
+            // Environment Details
+            DEV_ENV = "dev"
+            TST_ENV = "test"
+            STG_ENV = "stage"
+            PRD_ENV = "prod"
         
         // Chart details
             HELM_CHART_PATH = "${workspace}/chathura-shared-lib/chart"
