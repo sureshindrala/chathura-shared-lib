@@ -15,29 +15,6 @@ def call(Map pipelineParams) {
             jdk 'JDK-17'
         }
         parameters {
-            choice (name: 'scanOnly',
-                    choices: 'no\nyes',
-            )
-            choice (name: 'buildOnly',
-                choices: 'no\nyes',
-            )
-            choice (name: 'dockerPush',
-                choices: 'no\nyes',
-            )
-            choice (name: 'deployToDev',
-                choices: 'no\nyes',
-            )
-            choice (name: 'deployToTest',
-                choices: 'no\nyes',
-            )
-            choice (name: 'deployToStage',
-                choices: 'no\nyes',
-            )
-            choice (name: 'deployToProd',
-                choices: 'no\nyes',
-            )                                            
-        }
-        parameters {
             string(name: 'NAMESPACE_NAME', description: "Enter the name of the namespace, you want to create")
         }        
         environment {
@@ -104,21 +81,21 @@ def call(Map pipelineParams) {
                     }
                 }
     
-            }
-            post {
-                always {
-                    echo "Cleaning up the chathura-shared-lib directory"
-                    script {
-                        def sharedLibDir = "${workspace}/chathura-shared-lib"
-                        if (fileExists(sharedLibDir)) {
-                            echo "Deleting the shared library directory: ${sharedLibDir}"
-                            sh "rm -rf ${sharedLibDir}"
-                        }
-                        else {
-                            echo "Shared library directory does not exist: ${sharedLibDir}, seems already cleandup"
-                        }
+        }
+        post {
+            always {
+                echo "Cleaning up the chathura-shared-lib directory"
+                script {
+                    def sharedLibDir = "${workspace}/chathura-shared-lib"
+                    if (fileExists(sharedLibDir)) {
+                        echo "Deleting the shared library directory: ${sharedLibDir}"
+                        sh "rm -rf ${sharedLibDir}"
+                    }
+                    else {
+                        echo "Shared library directory does not exist: ${sharedLibDir}, seems already cleandup"
                     }
                 }
-        }   }                                    
-    }   
+            }
+    }   }                                    
+ }   
 }
