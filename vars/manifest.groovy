@@ -20,17 +20,17 @@ def call(Map pipelineParams) {
         environment {
             APPLICATION_NAME = "${pipelineParams.appName}"
             // the below are hostports
-            DEV_HOST_PORT = "${pipelineParams.devHostPort}"
-            TST_HOST_PORT = "${pipelineParams.tstHostPort}"
-            STG__HOST_PORT = "${pipelineParams.stgHostPort}"
-            PROD__HOST_PORT = "${pipelineParams.prdHostPort}"
-            CONT_PORT = "${pipelineParams.contPort}"
-            SONAR_HOST= 'http://34.172.162.27:9000'
-            POM_VERSION = readMavenPom().getVersion()
-            POM_PACKAGING = readMavenPom().getPackaging()
-            DOCKER_HUB = "docker.io/sureshindrala"
-            DOCKER_CREDS = credentials('dockerhub_sureshindrala_creds')
-            DOCKER_SERVER= "136.114.27.219"
+            // DEV_HOST_PORT = "${pipelineParams.devHostPort}"
+            // TST_HOST_PORT = "${pipelineParams.tstHostPort}"
+            // STG__HOST_PORT = "${pipelineParams.stgHostPort}"
+            // PROD__HOST_PORT = "${pipelineParams.prdHostPort}"
+            // CONT_PORT = "${pipelineParams.contPort}"
+            // SONAR_HOST= 'http://34.172.162.27:9000'
+            // POM_VERSION = readMavenPom().getVersion()
+            // POM_PACKAGING = readMavenPom().getPackaging()
+            // DOCKER_HUB = "docker.io/sureshindrala"
+            // DOCKER_CREDS = credentials('dockerhub_sureshindrala_creds')
+            // DOCKER_SERVER= "136.114.27.219"
 
         // *******Kubernetes cluster**********
             DEV_CLUSTER_NAME = "chathura-cluster"
