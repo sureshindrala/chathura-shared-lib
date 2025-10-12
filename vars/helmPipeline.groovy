@@ -79,7 +79,6 @@ def call(Map pipelineParams) {
             
         }
         stages{
-
             stage('CheckoutSharedLib'){
                 steps {
                     script {
@@ -126,22 +125,6 @@ def call(Map pipelineParams) {
                 }
     
             }
-            // stage ('Build Format') {
-            //         steps {
-            //             echo "***************************Printing Build Format*****************************"
-            //             script {
-            //                 sh """
-            //                 echo "Testing JAR SOURCE: chathura-${env.APPLICATION_NAME}-${env.POM_VERSION}.${env.POM_PACKAGING}"
-                            
-                            
-
-            //                 """
-            //                 // sh "cp ${workspace}/target/chathura-${env.APPLICATION_NAME}-${env.POM_VERSION}.${env.POM_PACKAGING} ./.cicd"
-            //                 // sh "ls -la ./.cicd"
-            //                 // sh "docker build --force-rm --no-cache --pull --rm=true --build-arg JAR_SOURCE=chathura-${env.APPLICATION_NAME}-${env.POM_VERSION}.${env.POM_PACKAGING} -t ${env.DOCKER_HUB}/${env.APPLICATION_NAME}:${GIT_COMMIT} ./.cicd "
-            //             }
-            //         }
-            //     }
             stage ('docker build and push') {
                 when {
                     anyOf {
@@ -173,19 +156,12 @@ def call(Map pipelineParams) {
                         echo "**************k8s-login to cluster*********************"
                         k8s.auth_login("${env.DEV_CLUSTER_NAME}", "${env.DEV_CLUSTER_ZONE}", "${env.DEV_PROJECT_ID}")
 
-                        // this will validate the image
-
-                         
+                        
                         imageValidation().call()                                         
 
                         echo "************Deploying Using Helm Charts****************"
                         k8s.k8sHelmChartDeploy("${env.APPLICATION_NAME}", "${DEV_ENV}", "${HELM_CHART_PATH}", "${GIT_COMMIT}", "${env.DEV_NAMESPACE}")
-                        //  sh "helm version" 
-                        //k8s.k8sHelmChartDeploy("${env.APPLICATION_NAME}", "${DEV_ENV}", "${HELM_CHART_PATH}", "${GIT_COMMIT}", "${env.DEV_NAMESPACE}")
 
-                        //k8s.k8sdeploy("${env.K8S_DEV_FILE}", docker_image, "${env.DEV_NAMESPACE}")
-
-                        // dockerdeploy('dev', "${env.DEV_HOST_PORT}", "${env.CONT_PORT}").call()
                     }
                 }
             }
@@ -271,9 +247,9 @@ def call(Map pipelineParams) {
                             echo "Shared library directory does not exist: ${sharedLibDir}, seems already cleandup"
                         }
                     }
-                 }
-        }                                    
-    }
+                }
+            }                                    
+    }   
 }
                 
     
