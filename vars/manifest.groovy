@@ -67,7 +67,7 @@ def call(Map pipelineParams) {
                 }
             }            
             stage('Authentication'){
-                steps{
+                steps {
                     script{
                         echo "**************k8s-login to cluster*********************"
                         k8s.auth_login("${env.DEV_CLUSTER_NAME}", "${env.DEV_CLUSTER_ZONE}", "${env.DEV_PROJECT_ID}")                        
