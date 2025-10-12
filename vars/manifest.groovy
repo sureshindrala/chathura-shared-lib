@@ -93,9 +93,10 @@ def call(Map pipelineParams) {
                     }
                     else {
                         echo "Shared library directory does not exist: ${sharedLibDir}, seems already cleandup"
+                        }
                     }
                 }
-            }
-    }   }                                    
- }   
+            }                                       
+        }   
+    }
 }
