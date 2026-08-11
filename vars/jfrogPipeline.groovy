@@ -1,10 +1,18 @@
 import com.chathura.builds.Docker;
+import com.chathura.k8s.K8s;
 
 def call(Map pipelineParams) {
     Docker docker = new Docker(this)
+    K8s k8s = new K8s(this)
+
+
     pipeline {
         agent {
             label 'k8s-slave'
+        }
+        tools {
+            maven 'Maven-3.9.11'
+            jdk 'JDK-17'
         }
         parameters {
             choice (name: 'scanOnly',
@@ -37,15 +45,44 @@ def call(Map pipelineParams) {
             STG__HOST_PORT = "${pipelineParams.stgHostPort}"
             PROD__HOST_PORT = "${pipelineParams.prdHostPort}"
             CONT_PORT = "${pipelineParams.contPort}"
-            SONAR_HOST= "http://35.196.58.210:9000"
+            SONAR_HOST= 'http://34.172.162.27:9000'
             POM_VERSION = readMavenPom().getVersion()
             POM_PACKAGING = readMavenPom().getPackaging()
-            DOCKER_HUB = "docker.io/sureshindrala"
-            DOCKER_CREDS = credentials('docker_creds')
-            DOCKER_SERVER= "136.119.45.10"
+             DOCKER_SERVER= "136.114.27.219"
+
+
+         // *******Jfrog-registry- ********** 
+            JFROG_DOCKER_REGISTRY = "trialbc0u3p.jfrog.io"
+            JFROG_DOCKER_REPO_NAME = "cart-docker-docker"
+            JFROG_CREDS = credentials('Jfrog_login_creds') // credentials to connect to my private JFROG            
+
+        // *******Kubernetes cluster**********
+            DEV_CLUSTER_NAME = "chathura-cluster"
+            DEV_CLUSTER_ZONE = "us-central1-a"
+            DEV_PROJECT_ID = "chathura-project"
+
+        //*******KUBERNETES yml FILE************
+            K8S_DEV_FILE = "k8s_dev.yml"
+            K8S_TST_FILE = "k8s_test.yml"
+            K8S_STG_FILE = "k8s_stage.yml"
+            K8S_PRD_FILE = "k8s_prod.yml"
+
+        // *******KUBERNETES NAMESPACES*******
+            DEV_NAMESPACE = "dev-cart-ns"
+            TST_NAMESPACE = "test-cart-ns"
+            STG_NAMESPACE = "stage-cart-ns"
+            PRD_NAMESPACE = "prod-cart-ns"
 
         }
         stages{
+            // stage('Authentication') {
+            //     steps{
+            //         echo "*********Authentication GKE*****************"
+            //         script {
+            //             k8s.auth_login("${env.DEV_CLUSTER_NAME}","${env.DEV_CLUSTER_ZONE}","${env.DEV_PROJECT_ID}")
+            //         }
+            //     }
+            // }
             stage('Build'){
                 when {
                     anyOf {
@@ -126,8 +163,21 @@ def call(Map pipelineParams) {
                 }
                 steps {
                     script {
+                        // this will create docker image///
+                        def docker_image =  "${env.JFROG_DOCKER_REGISTRY}/${env.JFROG_DOCKER_REPO_NAME}/${env.APPLICATION_NAME}:${GIT_COMMIT}"
+                        
+                        echo "**************k8s-login to cluster*********************"
+                        k8s.auth_login("${env.DEV_CLUSTER_NAME}", "${env.DEV_CLUSTER_ZONE}", "${env.DEV_PROJECT_ID}")
+
+                        // this will validate the image
+
                         imageValidation().call()
-                        dockerdeploy('dev', "${env.DEV_HOST_PORT}", "${env.CONT_PORT}").call()
+
+                        // Deploying to Kubernetes cluster in dev namespace 
+
+                        k8s.k8sdeploy("${env.K8S_DEV_FILE}", docker_image, "${env.DEV_NAMESPACE}")
+
+                        // dockerdeploy('dev', "${env.DEV_HOST_PORT}", "${env.CONT_PORT}").call()
                     }
                 }
             }
@@ -210,7 +260,7 @@ def imageValidation() {
     return {
         println("**************Attempting pull the docker image**********")
         try {
-            sh "docker pull ${env.DOCKER_HUB}/${env.APPLICATION_NAME}:${GIT_COMMIT}"
+            sh "docker pull  ${env.JFROG_DOCKER_REGISTRY}/${env.JFROG_DOCKER_REPO_NAME}/${env.APPLICATION_NAME}:${GIT_COMMIT}"
             println("*************docker image pulled succesfully*************")
         }
         catch(Exception e) {
@@ -228,10 +278,11 @@ def dockerBuildandPush() {
         sh """
             cp ${workspace}/target/chathura-${env.APPLICATION_NAME}-${env.POM_VERSION}.${env.POM_PACKAGING} ./.cicd
             ls -la ./.cicd
-            docker build --force-rm --no-cache --pull --rm=true --build-arg JAR_SOURCE=chathura-${env.APPLICATION_NAME}-${env.POM_VERSION}.${env.POM_PACKAGING} -t ${env.DOCKER_HUB}/${env.APPLICATION_NAME}:${GIT_COMMIT}  ./.cicd
-            echo "***********Docker login***********************"
-            docker login -u ${DOCKER_CREDS_USR} -p ${DOCKER_CREDS_PSW} 
-            docker push ${env.DOCKER_HUB}/${env.APPLICATION_NAME}:${GIT_COMMIT}
+            docker build --force-rm --no-cache --pull --rm=true --build-arg JAR_SOURCE=chathura-${env.APPLICATION_NAME}-${env.POM_VERSION}.${env.POM_PACKAGING} -t ${env.JFROG_DOCKER_REGISTRY}/${env.JFROG_DOCKER_REPO_NAME}/${env.APPLICATION_NAME}:${GIT_COMMIT}  ./.cicd
+            echo "***********Login to Jfrog Registry***********************"
+            docker login -u ${JFROG_CREDS_USR} -p ${JFROG_CREDS_PSW} trialbc0u3p.jfrog.io
+            echo "****************** Push Image to JFROG Registry ******************" 
+            docker push ${env.JFROG_DOCKER_REGISTRY}/${env.JFROG_DOCKER_REPO_NAME}/${env.APPLICATION_NAME}:${GIT_COMMIT}
 
 
         """        
@@ -240,7 +291,7 @@ def dockerBuildandPush() {
 
 def dockerdeploy(envDeploy,envPort,conPort) {
     return{
-    withCredentials([usernamePassword(credentialsId: 'dockervm_greesh_creds', 
+    withCredentials([usernamePassword(credentialsId: 'docker_vm_creds', 
         passwordVariable: 'PASSWORD', 
         usernameVariable: 'USERNAME')]) {
         try {
@@ -261,5 +312,3 @@ def dockerdeploy(envDeploy,envPort,conPort) {
         }
     }
 }
-
-

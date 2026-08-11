@@ -1,10 +1,18 @@
 import com.chathura.builds.Docker;
+import com.chathura.k8s.K8s;
 
 def call(Map pipelineParams) {
     Docker docker = new Docker(this)
+    K8s k8s = new K8s(this)
+
+
     pipeline {
         agent {
             label 'k8s-slave'
+        }
+        tools {
+            maven 'Maven-3.9.11'
+            jdk 'JDK-17'
         }
         parameters {
             choice (name: 'scanOnly',
@@ -37,15 +45,47 @@ def call(Map pipelineParams) {
             STG__HOST_PORT = "${pipelineParams.stgHostPort}"
             PROD__HOST_PORT = "${pipelineParams.prdHostPort}"
             CONT_PORT = "${pipelineParams.contPort}"
-            SONAR_HOST= "http://35.196.58.210:9000"
+            SONAR_HOST= 'http://34.172.162.27:9000'
             POM_VERSION = readMavenPom().getVersion()
             POM_PACKAGING = readMavenPom().getPackaging()
             DOCKER_HUB = "docker.io/sureshindrala"
-            DOCKER_CREDS = credentials('docker_creds')
-            DOCKER_SERVER= "136.119.45.10"
+            DOCKER_CREDS = credentials('dockerhub_sureshindrala_creds')
+            DOCKER_SERVER= "136.114.27.219"
 
+        // *******Kubernetes cluster**********
+            DEV_CLUSTER_NAME = "chathura-cluster"
+            DEV_CLUSTER_ZONE = "us-central1-a"
+            DEV_PROJECT_ID = "chathura-project"
+
+        //*******KUBERNETES yml FILE************
+            K8S_DEV_FILE = "k8s_dev.yml"
+            K8S_TST_FILE = "k8s_test.yml"
+            K8S_STG_FILE = "k8s_stage.yml"
+            K8S_PRD_FILE = "k8s_prod.yml"
+
+        // *******KUBERNETES NAMESPACES*******
+            DEV_NAMESPACE = "dev-cart-ns"
+            TST_NAMESPACE = "test-cart-ns"
+            STG_NAMESPACE = "stage-cart-ns"
+            PRD_NAMESPACE = "prod-cart-ns"
+            // Environment Details
+            DEV_ENV = "dev"
+            TST_ENV = "test"
+            STG_ENV = "stage"
+            PRD_ENV = "prod"
+        
+        // Chart details
+            HELM_CHART_PATH = "${workspace}/chathura-shared-lib/chart"
+            
         }
         stages{
+            stage('CheckoutSharedLib'){
+                steps {
+                    script {
+                        k8s.gitClone()
+                    }
+                }
+            }            
             stage('Build'){
                 when {
                     anyOf {
@@ -85,22 +125,6 @@ def call(Map pipelineParams) {
                 }
     
             }
-            // stage ('Build Format') {
-            //         steps {
-            //             echo "***************************Printing Build Format*****************************"
-            //             script {
-            //                 sh """
-            //                 echo "Testing JAR SOURCE: chathura-${env.APPLICATION_NAME}-${env.POM_VERSION}.${env.POM_PACKAGING}"
-                            
-                            
-
-            //                 """
-            //                 // sh "cp ${workspace}/target/i27-${env.APPLICATION_NAME}-${env.POM_VERSION}.${env.POM_PACKAGING} ./.cicd"
-            //                 // sh "ls -la ./.cicd"
-            //                 // sh "docker build --force-rm --no-cache --pull --rm=true --build-arg JAR_SOURCE=i27-${env.APPLICATION_NAME}-${env.POM_VERSION}.${env.POM_PACKAGING} -t ${env.DOCKER_HUB}/${env.APPLICATION_NAME}:${GIT_COMMIT} ./.cicd "
-            //             }
-            //         }
-            //     }
             stage ('docker build and push') {
                 when {
                     anyOf {
@@ -126,8 +150,18 @@ def call(Map pipelineParams) {
                 }
                 steps {
                     script {
-                        imageValidation().call()
-                        dockerdeploy('dev', "${env.DEV_HOST_PORT}", "${env.CONT_PORT}").call()
+                        // this will create docker image///
+                        def docker_image = "${env.DOCKER_HUB}/${env.APPLICATION_NAME}:${GIT_COMMIT}"
+                        
+                        echo "**************k8s-login to cluster*********************"
+                        k8s.auth_login("${env.DEV_CLUSTER_NAME}", "${env.DEV_CLUSTER_ZONE}", "${env.DEV_PROJECT_ID}")
+
+                        
+                        imageValidation().call()                                         
+
+                        echo "************Deploying Using Helm Charts****************"
+                        k8s.k8sHelmChartDeploy("${env.APPLICATION_NAME}", "${DEV_ENV}", "${HELM_CHART_PATH}", "${GIT_COMMIT}", "${env.DEV_NAMESPACE}")
+
                     }
                 }
             }
@@ -192,11 +226,33 @@ def call(Map pipelineParams) {
                         dockerdeploy('dev', "${env.PROD__HOST_PORT}", "${env.CONT_PORT}").call()
                     }
                 }
-            }                        
+            }
+            stage('Clean') {
+                steps {
+                    echo "Cleaning up the workspace"
+                    cleanWs()
+                }
+            }
         }
-    }
+            post {
+                always {
+                    echo "Cleaning up the chathura-shared-lib directory"
+                    script {
+                        def sharedLibDir = "${workspace}/chathura-shared-lib"
+                        if (fileExists(sharedLibDir)) {
+                            echo "Deleting the shared library directory: ${sharedLibDir}"
+                            sh "rm -rf ${sharedLibDir}"
+                        }
+                        else {
+                            echo "Shared library directory does not exist: ${sharedLibDir}, seems already cleandup"
+                        }
+                    }
+                }
+            }                                    
+    }   
+}
                 
-    }
+    
 def buildApp(){
     return {
         echo "Building ${env.APPLICATION_NAME} Application"
@@ -240,7 +296,7 @@ def dockerBuildandPush() {
 
 def dockerdeploy(envDeploy,envPort,conPort) {
     return{
-    withCredentials([usernamePassword(credentialsId: 'dockervm_greesh_creds', 
+    withCredentials([usernamePassword(credentialsId: 'docker_vm_creds', 
         passwordVariable: 'PASSWORD', 
         usernameVariable: 'USERNAME')]) {
         try {
@@ -261,5 +317,3 @@ def dockerdeploy(envDeploy,envPort,conPort) {
         }
     }
 }
-
-
