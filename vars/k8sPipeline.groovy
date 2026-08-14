@@ -49,7 +49,7 @@ def call(Map pipelineParams) {
             POM_VERSION = readMavenPom().getVersion()
             POM_PACKAGING = readMavenPom().getPackaging()
             DOCKER_HUB = "docker.io/sureshindrala"
-            DOCKER_CREDS = credentials('dockerhub_sureshindrala_creds')
+            DOCKER_CREDS = credentials('docker_creds')
             DOCKER_SERVER= "136.119.45.10"
 
         // *******Kubernetes cluster**********
