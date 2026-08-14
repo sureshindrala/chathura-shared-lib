@@ -45,12 +45,12 @@ def call(Map pipelineParams) {
             STG__HOST_PORT = "${pipelineParams.stgHostPort}"
             PROD__HOST_PORT = "${pipelineParams.prdHostPort}"
             CONT_PORT = "${pipelineParams.contPort}"
-            SONAR_HOST= 'http://34.172.162.27:9000'
+            SONAR_HOST= "http://35.196.58.210:9000"
             POM_VERSION = readMavenPom().getVersion()
             POM_PACKAGING = readMavenPom().getPackaging()
             DOCKER_HUB = "docker.io/sureshindrala"
             DOCKER_CREDS = credentials('dockerhub_sureshindrala_creds')
-            DOCKER_SERVER= "136.114.27.219"
+            DOCKER_SERVER= "136.119.45.10"
 
         // *******Kubernetes cluster**********
             DEV_CLUSTER_NAME = "chathura-cluster"
@@ -286,7 +286,7 @@ def dockerBuildandPush() {
 
 def dockerdeploy(envDeploy,envPort,conPort) {
     return{
-    withCredentials([usernamePassword(credentialsId: 'docker_vm_creds', 
+    withCredentials([usernamePassword(credentialsId: 'dockervm_greesh_creds', 
         passwordVariable: 'PASSWORD', 
         usernameVariable: 'USERNAME')]) {
         try {
