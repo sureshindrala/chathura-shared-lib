@@ -55,7 +55,7 @@ def call(Map pipelineParams) {
         // *******Kubernetes cluster**********
             DEV_CLUSTER_NAME = "chathura-cluster"
             DEV_CLUSTER_ZONE = "us-central1-a"
-            DEV_PROJECT_ID = "chathura-project"
+            DEV_PROJECT_ID = "project-6662d06c-357a-4745-a74"
 
         //*******KUBERNETES yml FILE************
             K8S_DEV_FILE = "k8s_dev.yml"
