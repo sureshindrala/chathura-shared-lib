@@ -32,13 +32,13 @@ def call(Map pipelineParams) {
         environment {
             APPLICATION_NAME = "${pipelineParams.appName}"
             DOCKER_HUB = "docker.io/sureshindrala"
-            DOCKER_CREDS = credentials('dockerhub_sureshindrala_creds')
-            DOCKER_SERVER= "136.114.27.219"
+            DOCKER_CREDS = credentials('docker_creds')
+            DOCKER_SERVER= "136.119.45.10"
 
         // *******Kubernetes cluster**********
             DEV_CLUSTER_NAME = "chathura-cluster"
             DEV_CLUSTER_ZONE = "us-central1-a"
-            DEV_PROJECT_ID = "chathura-project"
+            DEV_PROJECT_ID = "project-6662d06c-357a-4745-a74"
 
         //*******KUBERNETES yml FILE************
             K8S_DEV_FILE = "k8s_dev.yml"
@@ -203,7 +203,7 @@ def dockerBuildandPush() {
 
 def dockerdeploy(envDeploy,envPort,conPort) {
     return{
-    withCredentials([usernamePassword(credentialsId: 'docker_vm_creds', 
+    withCredentials([usernamePassword(credentialsId: 'dockervm_greesh_creds', 
         passwordVariable: 'PASSWORD', 
         usernameVariable: 'USERNAME')]) {
         try {
