@@ -280,7 +280,7 @@ def dockerBuildandPush() {
         sh """
             cp ${workspace}/target/chathura-${env.APPLICATION_NAME}-${env.POM_VERSION}.${env.POM_PACKAGING} ./.cicd
             ls -la ./.cicd
-            docker build --force-rm --no-cache --pull --rm=true --build-arg JAR_SOURCE=chathura-${env.APPLICATION_NAME}-${env.POM_VERSION}.${env.POM_PACKAGING} -t ${env.GOOGLE_ARTFICAT_REGISTRY}/${env.GOOGLE_DOCKER_REPO_NAME}/${env.APPLICATION_NAME}:${GIT_COMMIT}  ./.cicd
+            docker build --force-rm --no-cache --pull --rm=true --build-arg JAR_SOURCE=chathura-${env.APPLICATION_NAME}-${env.POM_VERSION}.${env.POM_PACKAGING} -t ${env.GOOGLE_ARTFICAT_REGISTRY}/${env.DEV_PROJECT_ID}/${env.GOOGLE_DOCKER_REPO_NAME}/${env.APPLICATION_NAME}:${GIT_COMMIT}  ./.cicd
             echo "***********Login to GAR Registry***********************"
             gcloud auth configure-docker ${env.GOOGLE_ARTFICAT_REGISTRY} --quiet
             echo "****************** Push Image to JFROG Registry ******************" 
