@@ -166,7 +166,7 @@ def call(Map pipelineParams) {
                 steps {
                     script {
                         // this will create docker image///
-                        def docker_image =  def docker_image = "${env.GOOGLE_ARTFICAT_REGISTRY}/${env.DEV_PROJECT_ID}/${env.GOOGLE_DOCKER_REPO_NAME}/${env.APPLICATION_NAME}:${GIT_COMMIT}"
+                        def docker_image = "${env.GOOGLE_ARTFICAT_REGISTRY}/${env.DEV_PROJECT_ID}/${env.GOOGLE_DOCKER_REPO_NAME}/${env.APPLICATION_NAME}:${GIT_COMMIT}"
                         
                         echo "**************k8s-login to cluster*********************"
                         k8s.auth_login("${env.DEV_CLUSTER_NAME}", "${env.DEV_CLUSTER_ZONE}", "${env.DEV_PROJECT_ID}")
