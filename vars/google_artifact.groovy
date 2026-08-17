@@ -53,7 +53,7 @@ def call(Map pipelineParams) {
 
          // *******Jfrog-registry- ********** 
             //JFROG_DOCKER_REGISTRY = "trialbc0u3p.jfrog.io"
-            GOOGLE_ARTFICAT_REGISTRY = "us-central1-docker.pkg.dev"
+            GOOGLE_ARTFICAT_REGISTRY = "us-central1-docker.pkg.dev/project-6662d06c-357a-4745-a74/chathura-cloth"
             //JFROG_DOCKER_REPO_NAME = "cart-docker-docker"
             GOOGLE_DOCKER_REPO_NAME = "chathura-cloth"
            // JFROG_CREDS = credentials('Jfrog_login_creds') // credentials to connect to my private JFROG            
