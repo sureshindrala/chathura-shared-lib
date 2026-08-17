@@ -45,16 +45,18 @@ def call(Map pipelineParams) {
             STG__HOST_PORT = "${pipelineParams.stgHostPort}"
             PROD__HOST_PORT = "${pipelineParams.prdHostPort}"
             CONT_PORT = "${pipelineParams.contPort}"
-            SONAR_HOST= 'http://34.172.162.27:9000'
+            SONAR_HOST= "http://35.196.58.210:9000"
             POM_VERSION = readMavenPom().getVersion()
             POM_PACKAGING = readMavenPom().getPackaging()
-             DOCKER_SERVER= "136.114.27.219"
+             DOCKER_SERVER= "136.119.45.10"
 
 
          // *******Jfrog-registry- ********** 
-            JFROG_DOCKER_REGISTRY = "trialbc0u3p.jfrog.io"
-            JFROG_DOCKER_REPO_NAME = "cart-docker-docker"
-            JFROG_CREDS = credentials('Jfrog_login_creds') // credentials to connect to my private JFROG            
+            //JFROG_DOCKER_REGISTRY = "trialbc0u3p.jfrog.io"
+            GOOGLE_ARTFICAT_REGISTRY = "us-central1-docker.pkg.dev"
+            //JFROG_DOCKER_REPO_NAME = "cart-docker-docker"
+            GOOGLE_DOCKER_REPO_NAME = "chathura-cloth"
+           // JFROG_CREDS = credentials('Jfrog_login_creds') // credentials to connect to my private JFROG            
 
         // *******Kubernetes cluster**********
             DEV_CLUSTER_NAME = "chathura-cluster"
@@ -164,7 +166,7 @@ def call(Map pipelineParams) {
                 steps {
                     script {
                         // this will create docker image///
-                        def docker_image =  "${env.JFROG_DOCKER_REGISTRY}/${env.JFROG_DOCKER_REPO_NAME}/${env.APPLICATION_NAME}:${GIT_COMMIT}"
+                        def docker_image =  "${env.GOOGLE_ARTFICAT_REGISTRY}/${env.GOOGLE_DOCKER_REPO_NAME}/${env.APPLICATION_NAME}:${GIT_COMMIT}"
                         
                         echo "**************k8s-login to cluster*********************"
                         k8s.auth_login("${env.DEV_CLUSTER_NAME}", "${env.DEV_CLUSTER_ZONE}", "${env.DEV_PROJECT_ID}")
@@ -260,7 +262,7 @@ def imageValidation() {
     return {
         println("**************Attempting pull the docker image**********")
         try {
-            sh "docker pull  ${env.JFROG_DOCKER_REGISTRY}/${env.JFROG_DOCKER_REPO_NAME}/${env.APPLICATION_NAME}:${GIT_COMMIT}"
+            sh "docker pull  ${env.GOOGLE_ARTFICAT_REGISTRY}/${env.GOOGLE_DOCKER_REPO_NAME}/${env.APPLICATION_NAME}:${GIT_COMMIT}"
             println("*************docker image pulled succesfully*************")
         }
         catch(Exception e) {
@@ -278,11 +280,11 @@ def dockerBuildandPush() {
         sh """
             cp ${workspace}/target/chathura-${env.APPLICATION_NAME}-${env.POM_VERSION}.${env.POM_PACKAGING} ./.cicd
             ls -la ./.cicd
-            docker build --force-rm --no-cache --pull --rm=true --build-arg JAR_SOURCE=chathura-${env.APPLICATION_NAME}-${env.POM_VERSION}.${env.POM_PACKAGING} -t ${env.JFROG_DOCKER_REGISTRY}/${env.JFROG_DOCKER_REPO_NAME}/${env.APPLICATION_NAME}:${GIT_COMMIT}  ./.cicd
-            echo "***********Login to Jfrog Registry***********************"
-            docker login -u ${JFROG_CREDS_USR} -p ${JFROG_CREDS_PSW} trialbc0u3p.jfrog.io
+            docker build --force-rm --no-cache --pull --rm=true --build-arg JAR_SOURCE=chathura-${env.APPLICATION_NAME}-${env.POM_VERSION}.${env.POM_PACKAGING} -t ${env.GOOGLE_ARTFICAT_REGISTRY}/${env.GOOGLE_DOCKER_REPO_NAME}/${env.APPLICATION_NAME}:${GIT_COMMIT}  ./.cicd
+            echo "***********Login to GAR Registry***********************"
+            gcloud auth configure-docker ${env.GAR_REGISTRY} --quiet
             echo "****************** Push Image to JFROG Registry ******************" 
-            docker push ${env.JFROG_DOCKER_REGISTRY}/${env.JFROG_DOCKER_REPO_NAME}/${env.APPLICATION_NAME}:${GIT_COMMIT}
+            docker push ${env.GOOGLE_ARTFICAT_REGISTRY}/${env.GOOGLE_DOCKER_REPO_NAME}/${env.APPLICATION_NAME}:${GIT_COMMIT}
 
 
         """        
