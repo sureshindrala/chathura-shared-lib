@@ -10,10 +10,10 @@ def call(Map pipelineParams) {
         agent {
             label 'k8s-slave'
         }
-        tools {
-            maven 'Maven-3.9.11'
-            jdk 'JDK-17'
-        }
+        // tools {
+        //     maven 'Maven-3.9.11'
+        //     jdk 'JDK-17'
+        // }
         parameters {
             choice (name: 'scanOnly',
                     choices: 'no\nyes',
